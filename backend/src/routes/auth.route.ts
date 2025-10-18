@@ -6,7 +6,7 @@ import {
   loginController,
   logOutController,
   registerUserController,
-} from "../controllers/auth.controllers";
+} from "../controllers/auth.controller";
 
 const failedurl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`;
 

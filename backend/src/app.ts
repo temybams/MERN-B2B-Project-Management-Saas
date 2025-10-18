@@ -13,6 +13,9 @@ import { asyncHandler } from "./middlewares/async.Middleware";
 import connectDatabase from "./config/db.Config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import authRoutes from "./routes/auth.route";
+import workspaceRoutes from "./routes/workspace.route";
+import isAuthenticated from "./middlewares/isAuthenticated.middleware";
+import memberRoutes from "./routes/member.route";
 
 
 
@@ -67,6 +70,8 @@ app.get(
 );
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/workspace`, isAuthenticated, workspaceRoutes);
+app.use(`${BASE_PATH}/member`, isAuthenticated, memberRoutes);
 
 app.use(errorHandler);
 
