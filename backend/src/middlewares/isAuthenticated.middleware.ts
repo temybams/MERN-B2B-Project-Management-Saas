@@ -1,8 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { RequestHandler } from "express";
 import { UnauthorizedException } from "../utils/appErrors";
+import { RequestWithUser } from "../@types/request";
 
-const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user || !req.user._id) {
+const isAuthenticated: RequestHandler = (req, res, next) => {
+  const userReq = req as RequestWithUser;
+  if (!userReq.user || !userReq.user._id) {
     throw new UnauthorizedException("Unauthorized. Please log in.");
   }
   next();

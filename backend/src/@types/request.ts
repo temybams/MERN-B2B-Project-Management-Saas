@@ -1,8 +1,8 @@
 import { Request } from "express";
 import { Types } from "mongoose";
-import  { UserDocument }  from "../models/user.model";
+import { UserDocument } from "../models/user.model";
 
-export type RequestUser = Omit<UserDocument, "password"> & { _id: Types.ObjectId };
+export type RequestUser = Omit<UserDocument, "password"> & { _id: string};
 
 export type RequestWithUser = Request & {
   user?: RequestUser;

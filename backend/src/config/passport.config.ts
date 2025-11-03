@@ -36,7 +36,8 @@ passport.use(
           picture: picture,
           email: email,
         });
-        done(null, user);
+        done(null, { ...user.toObject(), _id: user._id.toString() } as any);
+
       } catch (error) {
         done(error, false);
       }
@@ -54,7 +55,7 @@ passport.use(
     async (email, password, done) => {
       try {
         const user = await verifyUserService({ email, password });
-        return done(null, user);
+        return done(null, { ...user.toObject(), _id: user._id.toString() } as any);
       } catch (error: any) {
         return done(error, false, { message: error?.message });
       }
