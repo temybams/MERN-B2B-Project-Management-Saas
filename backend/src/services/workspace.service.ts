@@ -27,7 +27,7 @@ export const createWorkspaceService = async (userId: string, body: { name: strin
     await workspace.save();
 
     const member = new MemberModel({
-        userID: user._id,
+        userId: user._id,
         workspaceId: workspace._id,
         role: OwnerRole._id,
         joinedAt: new Date(),

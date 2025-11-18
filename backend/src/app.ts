@@ -25,6 +25,13 @@ import taskRoutes from "./routes/task.route";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: config.FRONTEND_ORIGIN,
+    credentials: true,
+  })
+);
+
 const BASE_PATH = config.BASE_PATH
 
 
@@ -49,13 +56,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(
-  cors({
-    origin: config.FRONTEND_ORIGIN,
-    credentials: true,
-  })
-);
 
 
 

@@ -1,4 +1,5 @@
 import passport from "passport";
+import { Types } from "mongoose";
 import { Request } from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -10,6 +11,8 @@ import {
   loginOrCreateAccountService,
   verifyUserService,
 } from "../services/auth.service";
+
+import  User from "../models/user.model";
 
 passport.use(
   new GoogleStrategy(
@@ -36,7 +39,7 @@ passport.use(
           picture: picture,
           email: email,
         });
-        done(null, { ...user.toObject(), _id: user._id.toString() } as any);
+        done(null, { ...user, _id: user._id.toString() } as any);
 
       } catch (error) {
         done(error, false);
@@ -55,7 +58,7 @@ passport.use(
     async (email, password, done) => {
       try {
         const user = await verifyUserService({ email, password });
-        return done(null, { ...user.toObject(), _id: user._id.toString() } as any);
+        return done(null, { ...user, _id: user._id.toString() } as any);
       } catch (error: any) {
         return done(error, false, { message: error?.message });
       }
@@ -63,5 +66,21 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => done(null, user));
-passport.deserializeUser((user: any, done) => done(null, user));
+// Only store user._id in session
+passport.serializeUser((user: any, done) => {
+  done(null, user._id);
+});
+
+// Retrieve full user in deserialize
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await User.findById(id).select("-password");
+    if (!user) return done(new NotFoundException("User not found"), null);
+
+
+    done(null, user); 
+  } catch (error) {
+    done(error, null);
+  }
+});
+
