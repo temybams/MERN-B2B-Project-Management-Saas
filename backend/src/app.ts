@@ -21,8 +21,6 @@ import projectRoutes from "./routes/project.route";
 import taskRoutes from "./routes/task.route";
 
 
-
-
 const app = express();
 
 app.use(
@@ -59,18 +57,12 @@ app.use(passport.session());
 
 
 
-app.get(
-  `/`,
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    throw new BadRequestException(
-      "This is a bad request",
-      ErrorCodeEnum.AUTH_INVALID_TOKEN
-    );
-    return res.status(HTTPSTATUS.OK).json({
-      message: "Hello, this is my project management project",
-    });
-  })
-);
+app.get("/", (req: Request, res: Response) => {
+  return res.status(200).json({
+    message: "Backend is running successfully 🚀",
+  });
+});
+
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
