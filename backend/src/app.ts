@@ -57,11 +57,14 @@ app.use(passport.session());
 
 
 
-app.get("/", (req: Request, res: Response) => {
-  return res.status(200).json({
-    message: "Backend is running successfully 🚀",
-  });
-});
+app.get(
+  `/`,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Hello, this is my project management project",
+    });
+  })
+);
 
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
