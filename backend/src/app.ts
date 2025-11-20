@@ -22,6 +22,7 @@ import taskRoutes from "./routes/task.route";
 
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -42,6 +43,7 @@ app.use(
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true, 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
       secure: true,
