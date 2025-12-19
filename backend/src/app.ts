@@ -22,10 +22,7 @@ import taskRoutes from "./routes/task.route";
 
 
 const app = express();
-const BASE_PATH = config.BASE_PATH
-// app.set("trust proxy", 1);
-//mooved the base url
-
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -34,6 +31,7 @@ app.use(
   })
 );
 
+const BASE_PATH = config.BASE_PATH
 
 
 app.use(express.json());
