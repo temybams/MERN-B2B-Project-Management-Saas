@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
     "seed": "ts-node src/seeders/role.seeder.ts",
+    "prebuild": "node -e \"try{require.resolve('@types/node/package.json');require.resolve('typescript/package.json')}catch(e){console.error('Build deps missing. On Render: Clear build cache & deploy.'); process.exit(1)}\"",
     "build": "tsc",
     "start": "node dist/app.js"
   },

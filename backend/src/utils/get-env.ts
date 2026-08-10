@@ -1,10 +1,13 @@
-export const getEnv = (key: string, defaultValue: string = ""): string => {
-  const value = process.env[key];
-  if (value === undefined) {
-    if (defaultValue) {
+export const getEnv = (key: string, defaultValue?: string): string => {
+  const raw = process.env[key];
+
+  if (raw === undefined || raw === "") {
+    if (defaultValue !== undefined) {
       return defaultValue;
     }
-    throw new Error(`Enviroment variable ${key} is not set`);
+    throw new Error(`Environment variable ${key} is not set`);
   }
-  return value;
+
+  // Strip quotes often pasted into Render/Vercel dashboards: "value" or 'value'
+  return raw.trim().replace(/^(['"])(.*)\1$/, "$2");
 };
