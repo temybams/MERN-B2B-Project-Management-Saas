@@ -27,6 +27,10 @@ export const loginOrCreateAccountService = async (data: {
     session.startTransaction();
     console.log("Started Session...");
 
+    if (!email) {
+      throw new BadRequestException("Email is required for this login provider");
+    }
+
     let user = await UserModel.findOne({ email }).session(session);
 
     if (!user) {
@@ -71,6 +75,26 @@ export const loginOrCreateAccountService = async (data: {
 
       user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
       await user.save({ session });
+    } else {
+      // Returning user: ensure provider account is linked
+      const existingAccount = await AccountModel.findOne({
+        provider,
+        providerId,
+      }).session(session);
+
+      if (!existingAccount) {
+        const account = new AccountModel({
+          userId: user._id,
+          provider,
+          providerId,
+        });
+        await account.save({ session });
+      }
+
+      if (picture && !user.profilePicture) {
+        user.profilePicture = picture;
+        await user.save({ session });
+      }
     }
     await session.commitTransaction();
     session.endSession();

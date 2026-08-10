@@ -16,7 +16,7 @@ API.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const { data, status } = error.response;
+    const { data, status } = error.response || {};
 
     if (data === "Unauthorized" && status === 401) {
       window.location.href = "/";
@@ -24,6 +24,11 @@ API.interceptors.response.use(
 
     const customError: CustomError = {
       ...error,
+      message:
+        data?.message ||
+        data?.error ||
+        error.message ||
+        "Something went wrong. Please try again.",
       errorCode: data?.errorCode || "UNKNOWN_ERROR",
     };
 

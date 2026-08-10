@@ -19,6 +19,7 @@ import memberRoutes from "./routes/member.route";
 import userRoutes from "./routes/user.route";
 import projectRoutes from "./routes/project.route";
 import taskRoutes from "./routes/task.route";
+import MongoStore from "connect-mongo";
 
 
 const app = express();
@@ -38,17 +39,22 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }))
 
+const isProduction = config.NODE_ENV === "production";
+
 app.use(
   session({
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     proxy: true, 
+    store: MongoStore.create({
+      mongoUrl: config.MONGO_URI,
+    }),
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
-      secure: true,
+      secure: isProduction,
       httpOnly: true,
-      sameSite: "none",
+      sameSite: isProduction ? "none" : "lax",
     },
   })
 );

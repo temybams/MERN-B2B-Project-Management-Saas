@@ -11,13 +11,19 @@ import passport from "passport";
 export const googleLoginCallback = asyncHandler(
     async (req: RequestWithUser, res: Response) => {
         const currentWorkspace = req.user?.currentWorkspace;
+        const workspaceId =
+            currentWorkspace && typeof currentWorkspace === "object"
+                ? String((currentWorkspace as { _id?: unknown })._id ?? currentWorkspace)
+                : currentWorkspace
+                    ? String(currentWorkspace)
+                    : null;
 
-        if (!currentWorkspace) {
+        if (!workspaceId || workspaceId === "undefined" || workspaceId === "null") {
             return res.redirect(`${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`);
         }
 
         return res.redirect(
-            `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`,
+            `${config.FRONTEND_ORIGIN}/workspace/${workspaceId}`,
         );
     }
 );
@@ -72,22 +78,36 @@ export const loginController = asyncHandler(
     });
 
 export const logOutController = asyncHandler(
-async (req: Request, res: Response) => {
-    req.logout((err) => {
-      if (err) {
-        console.error("Logout error:", err);
+  async (req: Request, res: Response) => {
+    const isProduction = config.NODE_ENV === "production";
+
+    req.logout((logoutErr) => {
+      if (logoutErr) {
+        console.error("Logout error:", logoutErr);
         return res
           .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
           .json({ error: "Failed to log out" });
       }
+
+      req.session.destroy((destroyErr) => {
+        if (destroyErr) {
+          console.error("Session destruction error:", destroyErr);
+          return res
+            .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
+            .json({ error: "Failed to log out" });
+        }
+
+        res.clearCookie("connect.sid", {
+          path: "/",
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
+        });
+
+        return res
+          .status(HTTPSTATUS.OK)
+          .json({ message: "Logged out successfully" });
+      });
     });
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Session destruction error:", err);
-      }
-    });
-    return res
-      .status(HTTPSTATUS.OK)
-      .json({ message: "Logged out successfully" });
   }
 );

@@ -1,24 +1,8 @@
-import "express";
-import { UserDocument } from "../../models/user.model";
+import { RequestUser } from "../request";
 
 declare global {
   namespace Express {
-    interface User extends UserDocument {
-      _id: string;
-    }
-
-    interface Request {
-      user?: User;
-
-      logIn(
-        user: User,
-        done: (err?: any) => void
-      ): void;
-
-      logOut(
-        done: (err?: any) => void
-      ): void;
-    }
+    interface User extends RequestUser {}
   }
 }
 

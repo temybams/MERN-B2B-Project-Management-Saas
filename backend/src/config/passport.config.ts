@@ -1,5 +1,4 @@
 import passport from "passport";
-import { Types } from "mongoose";
 import { Request } from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -14,6 +13,7 @@ import {
 
 import  User from "../models/user.model";
 
+
 passport.use(
   new GoogleStrategy(
     {
@@ -26,8 +26,6 @@ passport.use(
     async (req: Request, accessToken, refreshToken, profile, done) => {
       try {
         const { email, sub: googleId, picture } = profile._json;
-        console.log(profile, "profile");
-        console.log(googleId, "googleId");
         if (!googleId) {
           throw new NotFoundException("Google ID (sub) is missing");
         }
@@ -39,8 +37,13 @@ passport.use(
           picture: picture,
           email: email,
         });
-        done(null, { ...user, _id: user._id.toString() } as any);
 
+        // Plain object — spreading a Mongoose doc drops fields like currentWorkspace
+        const sessionUser = {
+          ...user.toObject(),
+          _id: user._id.toString(),
+        };
+        done(null, sessionUser as any);
       } catch (error) {
         done(error, false);
       }
@@ -68,19 +71,24 @@ passport.use(
 
 // Only store user._id in session
 passport.serializeUser((user: any, done) => {
-  done(null, user._id);
+  done(null, user._id.toString());
 });
 
 // Retrieve full user in deserialize
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id).select("-password");
-    if (!user) return done(new NotFoundException("User not found"), null);
+    if (!user) return done(null, null);
 
+    const sessionUser = {
+      ...user.toObject(),
+      _id: user._id.toString(),
+    };
 
-    done(null, user); 
-  } catch (error) {
-    done(error, null);
+    done(null, sessionUser);
+  } catch (err) {
+    done(err, null);
   }
 });
+
 

@@ -5,7 +5,12 @@ const GoogleOauthButton = (props: { label: string }) => {
   const { label } = props;
 
   const handleClick = () => {
-    window.location.href = `${baseURL}/auth/google`;
+    const apiBase = (baseURL || "").replace(/\/$/, "");
+    if (!apiBase) {
+      console.error("VITE_API_BASE_URL is not set");
+      return;
+    }
+    window.location.href = `${apiBase}/auth/google`;
   };
   return (
     <Button

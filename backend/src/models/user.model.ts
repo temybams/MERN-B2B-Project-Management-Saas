@@ -2,7 +2,6 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 import { compareValue, hashValue } from '../utils/bcrypt';
 
 export interface UserDocument extends Document {
-    _id: string;
     name: string;
     email: string;
     password?: string;
