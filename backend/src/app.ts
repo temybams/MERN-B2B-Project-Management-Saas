@@ -52,9 +52,11 @@ app.use(
     }),
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
+      // With Vercel /api proxy, browser sees first-party cookies on the frontend host.
+      // SameSite=None is only needed for direct cross-site API calls.
       secure: isProduction,
       httpOnly: true,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax",
     },
   })
 );
