@@ -1,7 +1,11 @@
 import { CustomError } from "@/types/custom-error.type";
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+// Production must use Vercel's same-origin proxy so session cookies remain
+// first-party. The environment variable is only needed by local development.
+const baseURL = import.meta.env.PROD
+  ? "/api"
+  : import.meta.env.VITE_API_BASE_URL || "/api";
 
 const options = {
   baseURL,
