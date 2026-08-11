@@ -3,15 +3,15 @@ import { UnauthorizedException } from "./appErrors";
 import { RolePermissions } from "./role-permission";
 
 export const roleGuard = (
-  role: keyof typeof RolePermissions,
+  role: keyof typeof RolePermissions | undefined,
   requiredPermissions: PermissionType[]
 ) => {
-  const permissions = RolePermissions[role];
+  const permissions = role ? RolePermissions[role] : undefined;
   // If the role doesn't exist or lacks required permissions, throw an exception
 
-  const hasPermission = requiredPermissions.every((permission) =>
-    permissions.includes(permission)
-  );
+  const hasPermission =
+    permissions?.length &&
+    requiredPermissions.every((permission) => permissions.includes(permission));
 
   if (!hasPermission) {
     throw new UnauthorizedException(

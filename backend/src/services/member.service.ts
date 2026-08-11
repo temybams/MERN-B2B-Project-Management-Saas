@@ -16,7 +16,25 @@ export const getMemberRoleInWorkspace = async (userId: string, workspaceId: stri
 
     if (!member) throw new UnauthorizedException("You are not a member of this workspace", ErrorCodeEnum.ACCESS_UNAUTHORIZED);
 
-    const roleName = member.role?.name;
+    let roleName = member.role?.name;
+
+    // Older memberships can reference deleted roles if roles were reseeded.
+    // Repair owners as OWNER and conservatively restore everyone else as MEMBER.
+    if (!roleName) {
+        const fallbackRoleName =
+            workspace.owner.toString() === userId.toString()
+                ? Roles.OWNER
+                : Roles.MEMBER;
+        const fallbackRole = await RoleModel.findOne({ name: fallbackRoleName });
+
+        if (!fallbackRole) {
+            throw new NotFoundException(`${fallbackRoleName} role not found`);
+        }
+
+        member.role = fallbackRole;
+        await member.save();
+        roleName = fallbackRole.name;
+    }
 
     return { role: roleName };
 
