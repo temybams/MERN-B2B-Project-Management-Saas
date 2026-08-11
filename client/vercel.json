@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://mern-b2b-project.onrender.com/api/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
